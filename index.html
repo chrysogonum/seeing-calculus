@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Seeing Calculus — for Professor Diskin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Spectral:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E27;
+    --bg2:#0c1130;
+    --panel:#141B3D;
+    --panel-edge:rgba(124,146,224,0.18);
+    --ink:#E7ECFF;
+    --ink-soft:#9BA6D6;
+    --ink-faint:#5E6B9E;
+    --cyan:#5BE9E4;
+    --amber:#F6C667;
+    --rose:#FF7AA2;
+    --violet:#A78BFA;
+    --hand:#F6C667;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 700px at 78% -8%, rgba(91,233,228,0.10), transparent 60%),
+      radial-gradient(1000px 800px at 10% 12%, rgba(167,139,250,0.10), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Spectral", Georgia, serif;
+    font-size:18px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* ---------- type ---------- */
+  h1,h2,h3{font-family:"Fraunces", serif; font-weight:500; line-height:1.08; letter-spacing:-0.01em;}
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:12px; letter-spacing:0.34em; text-transform:uppercase;
+    color:var(--cyan); margin:0 0 18px; font-weight:500;
+  }
+  .mono{font-family:"IBM Plex Mono", monospace;}
+  .hand{font-family:"Caveat", cursive; color:var(--hand); line-height:1.25;}
+
+  a{color:var(--cyan); text-decoration:none;}
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+  section{padding:96px 0; position:relative;}
+  .lede{font-size:21px; color:var(--ink-soft); max-width:62ch;}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 28px;
+    background:linear-gradient(var(--bg), rgba(10,14,39,0));
+    backdrop-filter:blur(2px);
+  }
+  nav .brand{font-family:"Fraunces"; font-size:17px; letter-spacing:-0.01em;}
+  nav .brand b{color:var(--cyan); font-weight:600;}
+  nav .links{display:flex; gap:22px; font-family:"IBM Plex Mono"; font-size:12.5px; letter-spacing:0.06em;}
+  nav .links a{color:var(--ink-soft);}
+  nav .links a:hover{color:var(--ink);}
+  @media(max-width:720px){ nav .links{display:none;} }
+
+  /* ---------- hero ---------- */
+  .hero{min-height:100svh; display:flex; flex-direction:column; justify-content:center; padding-top:60px;}
+  #heroCanvas{position:absolute; inset:0; width:100%; height:100%; z-index:0;}
+  .hero .wrap{position:relative; z-index:2;}
+  .hero h1{
+    font-size:clamp(44px, 8.5vw, 104px);
+    margin:0 0 8px;
+    font-weight:400;
+  }
+  .hero h1 .em{font-style:italic; color:var(--cyan); font-weight:500;}
+  .hero .sub{font-size:clamp(18px,2.4vw,24px); color:var(--ink-soft); max-width:54ch; margin-top:22px;}
+  .dedication{
+    margin-top:46px; padding-left:20px; border-left:2px solid rgba(246,198,103,0.5);
+    max-width:50ch;
+  }
+  .dedication .hand{font-size:25px;}
+  .dedication .src{font-family:"IBM Plex Mono"; font-size:11.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-faint); margin-top:8px;}
+  .scrollcue{
+    margin-top:54px; font-family:"IBM Plex Mono"; font-size:12px; letter-spacing:0.22em;
+    color:var(--ink-faint); text-transform:uppercase; display:flex; align-items:center; gap:12px;
+  }
+  .scrollcue .dot{width:7px;height:7px;border-radius:50%; background:var(--cyan); animation:pulse 2.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.25; transform:scale(.8)} 50%{opacity:1; transform:scale(1)}}
+
+  /* ---------- figure blocks ---------- */
+  .fig{
+    margin-top:38px;
+    display:grid; grid-template-columns: 1fr 250px; gap:0;
+    border:1px solid var(--panel-edge); border-radius:18px;
+    background:linear-gradient(180deg, rgba(20,27,61,0.92), rgba(12,17,48,0.92));
+    overflow:hidden;
+    box-shadow:0 30px 80px -40px rgba(0,0,0,0.8);
+  }
+  .fig .stage{padding:22px 22px 14px;}
+  .fig .margin{
+    border-left:1px solid var(--panel-edge);
+    padding:24px 22px;
+    background:rgba(8,11,32,0.5);
+    display:flex; flex-direction:column; gap:16px;
+  }
+  .fig .margin .hand{font-size:21px;}
+  @media(max-width:760px){
+    .fig{grid-template-columns:1fr;}
+    .fig .margin{border-left:none; border-top:1px solid var(--panel-edge);}
+  }
+  canvas.plot{width:100%; display:block; border-radius:10px; touch-action:none; cursor:ew-resize;}
+
+  .controls{display:flex; flex-wrap:wrap; align-items:center; gap:14px 20px; padding:14px 22px 6px; }
+  .controls label{font-family:"IBM Plex Mono"; font-size:12px; letter-spacing:0.06em; color:var(--ink-soft); display:flex; align-items:center; gap:10px;}
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; width:170px; height:3px; border-radius:3px;
+    background:rgba(124,146,224,0.3); outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:17px; height:17px; border-radius:50%;
+    background:var(--amber); cursor:pointer; box-shadow:0 0 0 4px rgba(246,198,103,0.18);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:17px; height:17px; border:none; border-radius:50%;
+    background:var(--amber); cursor:pointer; box-shadow:0 0 0 4px rgba(246,198,103,0.18);
+  }
+
+  .readout{display:flex; flex-wrap:wrap; gap:10px 26px; font-family:"IBM Plex Mono"; font-size:13px; padding:6px 22px 4px;}
+  .readout b{color:var(--ink); font-weight:500;}
+  .readout .k{color:var(--ink-faint);}
+  .v-cyan{color:var(--cyan);} .v-amber{color:var(--amber);} .v-rose{color:var(--rose);} .v-violet{color:var(--violet);}
+
+  .chip{
+    display:inline-block; font-family:"IBM Plex Mono"; font-size:11px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--ink-soft);
+    border:1px solid var(--panel-edge); border-radius:999px; padding:5px 11px;
+  }
+
+  .equation{
+    font-family:"IBM Plex Mono"; font-size:15px; color:var(--ink);
+    background:rgba(8,11,32,0.55); border:1px solid var(--panel-edge);
+    border-radius:10px; padding:13px 16px; margin:0; line-height:1.6; white-space:nowrap; overflow-x:auto;
+  }
+  .equation .op{color:var(--rose);} .equation .lim{color:var(--cyan);} .equation .hl{color:var(--amber);}
+
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:30px;}
+  @media(max-width:760px){ .two{grid-template-columns:1fr;} }
+
+  h2{font-size:clamp(30px,4.6vw,50px); margin:0 0 18px;}
+  h2 .num{font-family:"IBM Plex Mono"; font-size:14px; color:var(--cyan); display:block; letter-spacing:0.2em; margin-bottom:14px; font-weight:400;}
+  h3{font-size:22px; margin:0 0 8px;}
+  p{margin:0 0 18px;}
+  .muted{color:var(--ink-soft);}
+
+  .divider{height:1px; background:linear-gradient(90deg, transparent, var(--panel-edge), transparent); margin:0;}
+
+  /* finale */
+  .finale{ text-align:center; }
+  .finale h2{font-size:clamp(32px,5.5vw,62px);}
+  .finale .big-eq{
+    font-family:"Fraunces"; font-style:italic; font-size:clamp(26px,5vw,46px);
+    color:var(--ink); margin:34px 0; line-height:1.3;
+  }
+  .finale .big-eq .a{color:var(--cyan);}
+  .finale .big-eq .b{color:var(--amber);}
+  .sig{margin-top:50px;}
+  .sig .hand{font-size:30px;}
+  .footer{padding:40px 0 70px; text-align:center; color:var(--ink-faint); font-family:"IBM Plex Mono"; font-size:12px; letter-spacing:0.1em;}
+
+  :focus-visible{outline:2px solid var(--cyan); outline-offset:3px; border-radius:4px;}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .scrollcue .dot{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Seeing&nbsp;<b>Calculus</b></div>
+  <div class="links">
+    <a href="#change">change</a>
+    <a href="#limit">the limit</a>
+    <a href="#derivative">slopes</a>
+    <a href="#integral">area</a>
+    <a href="#theorem">the knot</a>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="wrap">
+    <p class="eyebrow">A practical, beautiful introduction</p>
+    <h1>The mathematics<br>of <span class="em">change itself</span>.</h1>
+    <p class="sub">Calculus is two simple ideas — slicing motion thin enough to freeze it, and adding up infinitely many slivers to rebuild a whole. Everything else is detail. Below, you don't read about it. You move it with your hands and watch the beauty arrive.</p>
+
+    <div class="dedication">
+      <p class="hand">"Watch what happens as it gets smaller. Keep watching. There — that's the whole secret, and it's gorgeous."</p>
+      <p class="src">For James Diskin · Penn State · who always could see it</p>
+    </div>
+
+    <div class="scrollcue"><span class="dot"></span> scroll to begin</div>
+  </div>
+</header>
+
+<!-- ================= 1. CHANGE ================= -->
+<section id="change">
+  <div class="wrap">
+    <h2><span class="num">01 — THE QUESTION</span>How fast, <em>right now?</em></h2>
+    <p class="lede">A car's speedometer reads 60. But "60 miles per <em>hour</em>" describes a whole hour — and the car isn't in one place for an hour, it's here, in this instant. So what could speed at a single frozen moment even <em>mean?</em> A distance covered in zero time is zero divided by zero. That paradox is where calculus begins, and the way out of it is the most beautiful trick in mathematics.</p>
+    <p class="muted" style="max-width:60ch;">The trick: don't ask about the instant directly. Ask about a tiny interval around it — then make the interval smaller, and smaller, and watch where the answer is <em>heading.</em></p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= 2. THE LIMIT ================= -->
+<section id="limit">
+  <div class="wrap">
+    <h2><span class="num">02 — THE LIMIT</span>Drag the gap to nothing.</h2>
+    <p class="lede">Pick two points on a curve and draw the straight line through them — a <span class="v-rose">secant</span>. Its steepness is "rise over run," the average change between them. Now slide the second point toward the first. The gap <span class="mono">h</span> shrinks. The secant pivots… and settles onto a single line that grazes the curve at one point: the <span class="v-amber">tangent</span>. Its slope is the instantaneous rate. Watch it happen.</p>
+
+    <div class="fig">
+      <div class="stage">
+        <canvas id="limitCanvas" class="plot"></canvas>
+        <div class="controls">
+          <label>gap&nbsp;<span class="mono">h</span>
+            <input id="limitH" type="range" min="0.02" max="3" step="0.01" value="2.4">
+          </label>
+          <span class="chip">drag the slider toward 0</span>
+        </div>
+        <div class="readout">
+          <span><span class="k">secant slope</span> <b class="v-rose" id="limitSec">–</b></span>
+          <span><span class="k">tangent slope</span> <b class="v-amber" id="limitTan">–</b></span>
+          <span><span class="k">gap h</span> <b id="limitHval">–</b></span>
+        </div>
+      </div>
+      <aside class="margin">
+        <p class="hand">As h melts away, the rose line lies down onto the gold one. The average becomes the instant.</p>
+        <p class="equation">f'(a) = <span class="lim">lim</span><sub>h→0</sub> <span class="hl">f(a+h)−f(a)</span>/<span class="op">h</span></p>
+        <p class="muted" style="font-size:14px; margin:0;">It never actually divides by zero. It asks where the number is <em>going</em>, and arrives without ever landing on the forbidden step. That sidestep is the limit.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= 3. THE DERIVATIVE ================= -->
+<section id="derivative">
+  <div class="wrap">
+    <h2><span class="num">03 — THE DERIVATIVE</span>Every slope, collected, is a new curve.</h2>
+    <p class="lede">Do that limit at <em>every</em> point of a curve and you get a slope at every point. Here's the quiet miracle: those slopes, gathered together, trace out a brand-new function — the <span class="v-amber">derivative</span>. Sweep your finger across the top wave. Up top, the gold tangent tilts. Down below, its steepness is written down as a height — and a second curve draws itself.</p>
+
+    <div class="fig">
+      <div class="stage">
+        <canvas id="derTop" class="plot"></canvas>
+        <canvas id="derBot" class="plot" style="margin-top:8px;"></canvas>
+        <div class="readout">
+          <span><span class="k">position x</span> <b id="derX">–</b></span>
+          <span><span class="k">height&nbsp; f(x)=sin x</span> <b class="v-cyan" id="derF">–</b></span>
+          <span><span class="k">slope&nbsp; f'(x)</span> <b class="v-amber" id="derD">–</b></span>
+        </div>
+      </div>
+      <aside class="margin">
+        <p class="hand">When the wave is flat at the top, its slope is zero — see the gold curve cross the line right there. They breathe together.</p>
+        <p class="muted" style="font-size:14px;margin:0;">The slope of <span class="v-cyan mono">sin x</span> turns out to be <span class="v-amber mono">cos x</span> — the same wave, shifted. Calculus didn't decide that. It was always true; this just lets you <em>see</em> it.</p>
+        <span class="chip">drag across the top panel</span>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= 4. THE INTEGRAL ================= -->
+<section id="integral">
+  <div class="wrap">
+    <h2><span class="num">04 — THE INTEGRAL</span>Add up infinitely many slivers.</h2>
+    <p class="lede">The other half of calculus runs the opposite way. How much area sits under a curve? Cover it with rectangles — crude at first, obviously wrong. Then use more, thinner ones. The jagged staircase presses closer and closer to the true smooth area. Add the slider's worth of rectangles and watch the error fall toward zero.</p>
+
+    <div class="fig">
+      <div class="stage">
+        <canvas id="riemCanvas" class="plot"></canvas>
+        <div class="controls">
+          <label>rectangles&nbsp;<span class="mono" id="riemNlabel">8</span>
+            <input id="riemN" type="range" min="1" max="160" step="1" value="8">
+          </label>
+          <span class="chip">slide toward many</span>
+        </div>
+        <div class="readout">
+          <span><span class="k">rectangle estimate</span> <b class="v-rose" id="riemEst">–</b></span>
+          <span><span class="k">true area</span> <b class="v-cyan" id="riemTrue">–</b></span>
+          <span><span class="k">error</span> <b id="riemErr">–</b></span>
+        </div>
+      </div>
+      <aside class="margin">
+        <p class="hand">Each rectangle is wrong. Infinitely many wrong rectangles, taken to the limit, are exactly right. That still gives me chills.</p>
+        <p class="equation">∫<sub>a</sub><sup>b</sup> f(x) dx = <span class="lim">lim</span><sub>n→∞</sub> Σ f(x<sub>i</sub>)·<span class="hl">Δx</span></p>
+        <p class="muted" style="font-size:14px;margin:0;">The long S, ∫, is a stretched-out "sum." It remembers that area is just addition — addition pushed all the way to the infinite.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= 5. THE THEOREM ================= -->
+<section id="theorem">
+  <div class="wrap">
+    <h2><span class="num">05 — THE FUNDAMENTAL THEOREM</span>The two ideas are one idea.</h2>
+    <p class="lede">Slopes and areas look like opposite questions. They are not. They are the same question read in two directions — and that is the result Professor Diskin called beautiful. Below: the top curve is some rate. The shaded <span class="v-cyan">area</span> beneath it, accumulated from the left, is plotted as the height of the bottom curve. Drag <span class="mono">x</span>.</p>
+    <p class="lede">Here is the knot tying calculus together: the <em>steepness</em> of the bottom curve, at every point, equals the <em>height</em> of the top one. Accumulating area and measuring slope undo each other perfectly. Integration and differentiation are inverses.</p>
+
+    <div class="fig">
+      <div class="stage">
+        <canvas id="ftcTop" class="plot"></canvas>
+        <canvas id="ftcBot" class="plot" style="margin-top:8px;"></canvas>
+        <div class="readout">
+          <span><span class="k">x</span> <b id="ftcX">–</b></span>
+          <span><span class="k">top height&nbsp; f(x)</span> <b class="v-cyan" id="ftcF">–</b></span>
+          <span><span class="k">area so far&nbsp; A(x)</span> <b class="v-violet" id="ftcA">–</b></span>
+          <span><span class="k">slope of A</span> <b class="v-amber" id="ftcSlope">–</b></span>
+        </div>
+      </div>
+      <aside class="margin">
+        <p class="hand">Look: "top height" and "slope of A" are the same number, always. That's not a coincidence — that's the theorem.</p>
+        <p class="equation">d/dx ∫<sub>a</sub><sup>x</sup> f(t) dt = <span class="hl">f(x)</span></p>
+        <p class="muted" style="font-size:14px;margin:0;">When the top curve is high, area piles on fast, so the bottom curve climbs steeply. When the top dips to zero, accumulation pauses and the bottom curve goes flat. They are locked together.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ================= FINALE ================= -->
+<section class="finale">
+  <div class="wrap">
+    <p class="eyebrow" style="justify-content:center;">What you just watched</p>
+    <h2>That's the whole of it.</h2>
+    <p class="lede" style="margin:0 auto;">You took motion and froze a single instant of it — the <span class="v-amber">derivative</span>. You took infinitely many fragments and rebuilt a whole — the <span class="v-cyan">integral</span>. Then you found they were one thing seen from two sides. Every technique in a calculus course is bookkeeping built on these two moves you just made with your own hand.</p>
+
+    <p class="big-eq">to <span class="b">slice</span> the whole into instants,<br>and <span class="a">sum</span> the instants back into a whole.</p>
+
+    <div class="sig">
+      <p class="hand">You saw it, Peter. It was never that you couldn't —<br>it was only that no one let you move it with your hands.</p>
+    </div>
+  </div>
+  <p class="footer">BUILT AS A LETTER OF THANKS TO A GOOD TEACHER · MOVE EVERY DIAGRAM · NOTHING HERE IS STATIC</p>
+</section>
+
+<script>
+"use strict";
+(function(){
+  const REDUCE = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------------- shared plotting helper ---------------- */
+  function Plotter(canvas, bounds, aspect, padOverride){
+    const ctx = canvas.getContext("2d");
+    const pad = Object.assign({l:42,r:18,t:16,b:30}, padOverride||{});
+    let W=0, H=0, dpr=1;
+    const b = bounds; // {xmin,xmax,ymin,ymax}
+
+    function resize(){
+      const cssW = canvas.clientWidth || canvas.parentElement.clientWidth;
+      const cssH = Math.max(150, Math.round(cssW*aspect));
+      dpr = Math.min(window.devicePixelRatio||1, 2);
+      W = cssW; H = cssH;
+      canvas.style.height = cssH+"px";
+      canvas.width = Math.round(cssW*dpr);
+      canvas.height = Math.round(cssH*dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    const sx = x => pad.l + (x-b.xmin)/(b.xmax-b.xmin)*(W-pad.l-pad.r);
+    const sy = y => pad.t + (b.ymax-y)/(b.ymax-b.ymin)*(H-pad.t-pad.b);
+    const ix = px => b.xmin + (px-pad.l)/(W-pad.l-pad.r)*(b.xmax-b.xmin);
+
+    function clear(){ ctx.clearRect(0,0,W,H); }
+
+    function grid(stepX, stepY){
+      ctx.lineWidth=1;
+      ctx.strokeStyle="rgba(124,146,224,0.10)";
+      ctx.beginPath();
+      for(let x=Math.ceil(b.xmin/stepX)*stepX; x<=b.xmax+1e-9; x+=stepX){
+        ctx.moveTo(sx(x),sy(b.ymax)); ctx.lineTo(sx(x),sy(b.ymin));
+      }
+      for(let y=Math.ceil(b.ymin/stepY)*stepY; y<=b.ymax+1e-9; y+=stepY){
+        ctx.moveTo(sx(b.xmin),sy(y)); ctx.lineTo(sx(b.xmax),sy(y));
+      }
+      ctx.stroke();
+    }
+    function axes(){
+      ctx.lineWidth=1.2; ctx.strokeStyle="rgba(180,195,240,0.34)";
+      ctx.beginPath();
+      if(b.ymin<=0 && b.ymax>=0){ ctx.moveTo(sx(b.xmin),sy(0)); ctx.lineTo(sx(b.xmax),sy(0)); }
+      else { ctx.moveTo(sx(b.xmin),sy(b.ymin)); ctx.lineTo(sx(b.xmax),sy(b.ymin)); }
+      if(b.xmin<=0 && b.xmax>=0){ ctx.moveTo(sx(0),sy(b.ymin)); ctx.lineTo(sx(0),sy(b.ymax)); }
+      ctx.stroke();
+    }
+    function plot(f, color, width, dash){
+      ctx.lineWidth=width||2.4; ctx.strokeStyle=color;
+      ctx.setLineDash(dash||[]);
+      ctx.lineJoin="round"; ctx.lineCap="round";
+      ctx.beginPath();
+      let started=false;
+      const N=420;
+      for(let i=0;i<=N;i++){
+        const x=b.xmin+(b.xmax-b.xmin)*i/N;
+        const y=f(x);
+        if(!isFinite(y)){started=false;continue;}
+        const X=sx(x), Y=sy(y);
+        if(!started){ctx.moveTo(X,Y);started=true;} else ctx.lineTo(X,Y);
+      }
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    function plotUntil(f,xstop,color,width){
+      ctx.lineWidth=width||2.6; ctx.strokeStyle=color;
+      ctx.lineJoin="round"; ctx.lineCap="round";
+      ctx.beginPath(); let started=false; const N=420;
+      for(let i=0;i<=N;i++){
+        const x=b.xmin+(b.xmax-b.xmin)*i/N;
+        if(x>xstop) break;
+        const y=f(x); if(!isFinite(y)){started=false;continue;}
+        if(!started){ctx.moveTo(sx(x),sy(y));started=true;} else ctx.lineTo(sx(x),sy(y));
+      }
+      ctx.stroke();
+    }
+    function lineWorld(x1,y1,x2,y2,color,width,dash){
+      ctx.lineWidth=width||2; ctx.strokeStyle=color; ctx.setLineDash(dash||[]);
+      ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(sx(x1),sy(y1)); ctx.lineTo(sx(x2),sy(y2)); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    function dot(x,y,color,r){
+      ctx.fillStyle=color; ctx.beginPath(); ctx.arc(sx(x),sy(y),r||5,0,7); ctx.fill();
+      ctx.strokeStyle="rgba(10,14,39,0.9)"; ctx.lineWidth=1.5; ctx.stroke();
+    }
+    function vline(x,color,dash){
+      ctx.lineWidth=1.2; ctx.strokeStyle=color; ctx.setLineDash(dash||[4,5]);
+      ctx.beginPath(); ctx.moveTo(sx(x),sy(b.ymax)); ctx.lineTo(sx(x),sy(b.ymin)); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    function label(text,x,y,color,align){
+      ctx.fillStyle=color; ctx.font='12px "IBM Plex Mono", monospace';
+      ctx.textAlign=align||"left"; ctx.textBaseline="middle";
+      ctx.fillText(text, sx(x), sy(y));
+      ctx.textAlign="left";
+    }
+    return {ctx, resize, clear, grid, axes, plot, plotUntil, lineWorld, dot, vline, label,
+            sx, sy, ix, get W(){return W;}, get H(){return H;}, bounds:b, pad};
+  }
+
+  const drawList = [];
+  function register(fn){ drawList.push(fn); fn(); }
+  function redrawAll(){ drawList.forEach(fn=>fn()); }
+  let rt; window.addEventListener("resize", ()=>{ clearTimeout(rt); rt=setTimeout(redrawAll,80); });
+
+  const fmt = (n,d)=> (n>=0?" ":"") + n.toFixed(d===undefined?2:d);
+
+  /* ================= HERO ambient ================= */
+  (function hero(){
+    const cv=document.getElementById("heroCanvas");
+    const ctx=cv.getContext("2d");
+    let W,H,dpr;
+    function size(){
+      dpr=Math.min(window.devicePixelRatio||1,2);
+      W=cv.clientWidth; H=cv.clientHeight;
+      cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    size(); window.addEventListener("resize",size);
+
+    // a flowing curve with a tangent line sweeping along it
+    function curveY(x, t){
+      // x in [0,1] mapped to screen
+      return 0.5 + 0.16*Math.sin(x*6.0 + t) + 0.07*Math.sin(x*11.0 - t*0.7);
+    }
+    let t=0;
+    function frame(){
+      ctx.clearRect(0,0,W,H);
+      // faint family of curves
+      for(let k=0;k<5;k++){
+        ctx.beginPath();
+        const phase=t*0.25 + k*0.6;
+        ctx.lineWidth=1;
+        ctx.strokeStyle="rgba(91,233,228,"+(0.05+0.02*k)+")";
+        for(let i=0;i<=160;i++){
+          const xx=i/160;
+          const yy=0.5 + (0.10+0.03*k)*Math.sin(xx*5.0+phase) + 0.05*Math.sin(xx*9.0-phase*0.6);
+          const X=xx*W, Y=yy*H;
+          if(i===0)ctx.moveTo(X,Y); else ctx.lineTo(X,Y);
+        }
+        ctx.stroke();
+      }
+      // main luminous curve
+      ctx.beginPath();
+      ctx.lineWidth=2.2; ctx.strokeStyle="rgba(91,233,228,0.55)";
+      ctx.shadowColor="rgba(91,233,228,0.5)"; ctx.shadowBlur=14;
+      for(let i=0;i<=200;i++){
+        const xx=i/200, yy=curveY(xx,t);
+        const X=xx*W, Y=yy*H;
+        if(i===0)ctx.moveTo(X,Y); else ctx.lineTo(X,Y);
+      }
+      ctx.stroke(); ctx.shadowBlur=0;
+
+      // sweeping tangent line gliding along the main curve
+      const px=0.5+0.45*Math.sin(t*0.4);
+      const h=0.0008;
+      const cx=px*W, cy=curveY(px,t)*H;
+      const m=(curveY(px+h,t)-curveY(px-h,t))/(2*h); // dy/dx in normalized units
+      const Lx=0.13*W;                                // half-length in pixels
+      ctx.beginPath();
+      ctx.lineWidth=2; ctx.strokeStyle="rgba(246,198,103,0.85)";
+      ctx.shadowColor="rgba(246,198,103,0.6)"; ctx.shadowBlur=10;
+      ctx.moveTo(cx-Lx, cy - m*(Lx/W)*H);
+      ctx.lineTo(cx+Lx, cy + m*(Lx/W)*H);
+      ctx.stroke(); ctx.shadowBlur=0;
+      // point of tangency
+      ctx.fillStyle="#F6C667"; ctx.beginPath(); ctx.arc(cx,cy,4.5,0,7); ctx.fill();
+
+      t+=0.012;
+      if(!REDUCE) requestAnimationFrame(frame);
+    }
+    if(REDUCE){ frame(); } else { requestAnimationFrame(frame); }
+  })();
+
+  /* ================= 2. LIMIT widget ================= */
+  (function(){
+    const cv=document.getElementById("limitCanvas");
+    const P = Plotter(cv, {xmin:-0.6,xmax:5.2,ymin:-0.4,ymax:3.4}, 0.52);
+    const f = x => 0.22*x*x;          // parabola
+    const fp = x => 0.44*x;           // true derivative
+    const a = 2.4;
+    const slider=document.getElementById("limitH");
+    const elSec=document.getElementById("limitSec"),
+          elTan=document.getElementById("limitTan"),
+          elH=document.getElementById("limitHval");
+
+    function draw(){
+      P.resize(); P.clear(); P.grid(1,1); P.axes();
+      const h=parseFloat(slider.value);
+      const fa=f(a), fah=f(a+h);
+      const sec=(fah-fa)/h, tan=fp(a);
+      // curve
+      P.plot(f, "#5BE9E4", 2.6);
+      // tangent (gold) drawn full width
+      P.lineWorld(P.bounds.xmin, fa+tan*(P.bounds.xmin-a), P.bounds.xmax, fa+tan*(P.bounds.xmax-a), "rgba(246,198,103,0.95)", 2.2, [7,5]);
+      // secant (rose)
+      const sx1=P.bounds.xmin, sx2=P.bounds.xmax;
+      P.lineWorld(sx1, fa+sec*(sx1-a), sx2, fa+sec*(sx2-a), "#FF7AA2", 2.4);
+      // h bracket
+      P.lineWorld(a, -0.25, a, fa, "rgba(155,166,214,0.4)",1,[3,4]);
+      P.lineWorld(a+h, -0.25, a+h, fah, "rgba(155,166,214,0.4)",1,[3,4]);
+      P.lineWorld(a, -0.18, a+h, -0.18, "rgba(255,122,162,0.8)",2);
+      P.label("h", a+h/2, -0.04, "#FF7AA2", "center");
+      // points
+      P.dot(a, fa, "#F6C667", 5.5);
+      P.dot(a+h, fah, "#FF7AA2", 5);
+      P.label("a", a, fa+0.32, "#F6C667","center");
+
+      elSec.textContent=fmt(sec); elTan.textContent=fmt(tan); elH.textContent=fmt(h);
+    }
+    slider.addEventListener("input",draw);
+    register(draw);
+  })();
+
+  /* ================= 3. DERIVATIVE tracer ================= */
+  (function(){
+    const top=document.getElementById("derTop");
+    const bot=document.getElementById("derBot");
+    const B={xmin:-0.3,xmax:6.6};
+    const PT=Plotter(top,{xmin:B.xmin,xmax:B.xmax,ymin:-1.5,ymax:1.5},0.34);
+    const PB=Plotter(bot,{xmin:B.xmin,xmax:B.xmax,ymin:-1.5,ymax:1.5},0.34);
+    const f=Math.sin, fp=Math.cos;
+    let cx=1.0;
+    const elX=document.getElementById("derX"),elF=document.getElementById("derF"),elD=document.getElementById("derD");
+
+    function draw(){
+      PT.resize();PB.resize();
+      // TOP
+      PT.clear();PT.grid(1,0.5);PT.axes();
+      PT.plot(f,"#5BE9E4",2.6);
+      const y0=f(cx), m=fp(cx);
+      PT.lineWorld(PT.bounds.xmin, y0+m*(PT.bounds.xmin-cx), PT.bounds.xmax, y0+m*(PT.bounds.xmax-cx), "rgba(246,198,103,0.95)",2.2);
+      PT.vline(cx,"rgba(167,139,250,0.5)");
+      PT.dot(cx,y0,"#F6C667",5.5);
+      PT.label("f(x) = sin x", 0.0, 1.32, "#5BE9E4","left");
+      // BOTTOM
+      PB.clear();PB.grid(1,0.5);PB.axes();
+      PB.plot(fp,"rgba(246,198,103,0.18)",2,[5,5]);     // ghost of full derivative
+      PB.plotUntil(fp,cx,"#F6C667",2.8);                // inked-in so far
+      PB.vline(cx,"rgba(167,139,250,0.5)");
+      PB.dot(cx,fp(cx),"#F6C667",5.5);
+      PB.label("f'(x) — the slope, recorded as a height", 0.0, 1.32, "#F6C667","left");
+
+      elX.textContent=fmt(cx); elF.textContent=fmt(y0); elD.textContent=fmt(m);
+    }
+    function pointer(e){
+      const r=top.getBoundingClientRect();
+      const px=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+      cx=Math.max(B.xmin+0.05, Math.min(B.xmax-0.05, PT.ix(px)));
+      draw();
+    }
+    let down=false;
+    function bind(cv){
+      cv.addEventListener("pointerdown",e=>{down=true;cv.setPointerCapture(e.pointerId);pointer(e);});
+      cv.addEventListener("pointermove",e=>{if(down)pointer(e);});
+      cv.addEventListener("pointerup",()=>down=false);
+      cv.addEventListener("pointercancel",()=>down=false);
+    }
+    bind(top);bind(bot);
+    register(draw);
+  })();
+
+  /* ================= 4. RIEMANN sum ================= */
+  (function(){
+    const cv=document.getElementById("riemCanvas");
+    const B={xmin:0.0,xmax:6.2,ymin:0,ymax:3.0};
+    const P=Plotter(cv,B,0.5);
+    const a=0.6,b=5.6;
+    const f=x=>1.4 + Math.sin(x) + 0.25*x;  // stays positive on [a,b]
+    // true area via fine midpoint sum
+    let TRUE=0;{ const N=4000,dx=(b-a)/N; for(let i=0;i<N;i++){TRUE+=f(a+(i+0.5)*dx)*dx;} }
+    const slider=document.getElementById("riemN"),
+          lab=document.getElementById("riemNlabel"),
+          elEst=document.getElementById("riemEst"),
+          elTrue=document.getElementById("riemTrue"),
+          elErr=document.getElementById("riemErr");
+    elTrue.textContent=fmt(TRUE);
+
+    function draw(){
+      P.resize();P.clear();P.grid(1,1);P.axes();
+      const n=parseInt(slider.value); lab.textContent=n;
+      const dx=(b-a)/n;
+      // rectangles (midpoint)
+      let est=0;
+      const ctx=P.ctx;
+      for(let i=0;i<n;i++){
+        const xm=a+(i+0.5)*dx, h=f(xm); est+=h*dx;
+        const xl=a+i*dx, xr=xl+dx;
+        const X=P.sx(xl), Yt=P.sy(h), Yb=P.sy(0);
+        ctx.fillStyle="rgba(255,122,162,0.18)";
+        ctx.fillRect(X,Yt, P.sx(xr)-X, Yb-Yt);
+        ctx.strokeStyle="rgba(255,122,162,0.7)"; ctx.lineWidth= n>80?0.4:1;
+        ctx.strokeRect(X+0.3,Yt, (P.sx(xr)-X)-0.6, Yb-Yt);
+      }
+      P.plot(f,"#5BE9E4",2.8);
+      P.lineWorld(a,0,a,f(a),"rgba(155,166,214,0.5)",1,[3,3]);
+      P.lineWorld(b,0,b,f(b),"rgba(155,166,214,0.5)",1,[3,3]);
+      P.label("a", a, -0.18, "#9BA6D6","center");
+      P.label("b", b, -0.18, "#9BA6D6","center");
+
+      elEst.textContent=fmt(est);
+      elErr.textContent=fmt(Math.abs(est-TRUE),4);
+    }
+    slider.addEventListener("input",draw);
+    register(draw);
+  })();
+
+  /* ================= 5. FUNDAMENTAL THEOREM ================= */
+  (function(){
+    const top=document.getElementById("ftcTop");
+    const bot=document.getElementById("ftcBot");
+    const B={xmin:0,xmax:6.4};
+    const a=0;
+    const f=x=>1.15 + 0.85*Math.sin(x*0.9);   // positive rate curve
+    const PT=Plotter(top,{xmin:B.xmin,xmax:B.xmax,ymin:0,ymax:2.4},0.32);
+    // precompute accumulation A(x)=∫_a^x f
+    const NS=1200, xs=new Float64Array(NS+1), As=new Float64Array(NS+1);
+    {let acc=0; const dx=(B.xmax-a)/NS; xs[0]=a; As[0]=0;
+     for(let i=1;i<=NS;i++){const x0=a+(i-1)*dx,x1=a+i*dx; acc+=0.5*(f(x0)+f(x1))*dx; xs[i]=x1; As[i]=acc;}}
+    let Amax=As[NS];
+    const PB=Plotter(bot,{xmin:B.xmin,xmax:B.xmax,ymin:0,ymax:Amax*1.08},0.32);
+    function A(x){ const t=(x-a)/(B.xmax-a)*NS; const i=Math.max(0,Math.min(NS-1,Math.floor(t))); const fr=t-i; return As[i]+(As[i+1]-As[i])*fr; }
+    let cx=2.2;
+    const elX=document.getElementById("ftcX"),elF=document.getElementById("ftcF"),
+          elA=document.getElementById("ftcA"),elS=document.getElementById("ftcSlope");
+
+    function draw(){
+      PT.resize();PB.resize();
+      // TOP: f with shaded area a..cx
+      PT.clear();PT.grid(1,1);PT.axes();
+      const ctx=PT.ctx;
+      ctx.beginPath();
+      ctx.moveTo(PT.sx(a),PT.sy(0));
+      const M=200;
+      for(let i=0;i<=M;i++){const x=a+(cx-a)*i/M; ctx.lineTo(PT.sx(x),PT.sy(f(x)));}
+      ctx.lineTo(PT.sx(cx),PT.sy(0)); ctx.closePath();
+      ctx.fillStyle="rgba(91,233,228,0.20)"; ctx.fill();
+      PT.plot(f,"#5BE9E4",2.8);
+      PT.vline(cx,"rgba(167,139,250,0.55)");
+      PT.dot(cx,f(cx),"#5BE9E4",5);
+      PT.label("f(x) — a rate.  shaded = area so far", 0.1, 2.18, "#5BE9E4","left");
+
+      // BOTTOM: A(x) with point and tangent of slope f(cx)
+      PB.clear();PB.grid(1,1);PB.axes();
+      PB.plotUntil(A,cx,"#A78BFA",2.8);
+      PB.plot(A,"rgba(167,139,250,0.18)",2,[5,5]);
+      const Ax=A(cx), m=f(cx); // FTC: A'(x)=f(x)
+      PB.lineWorld(PB.bounds.xmin, Ax+m*(PB.bounds.xmin-cx), PB.bounds.xmax, Ax+m*(PB.bounds.xmax-cx), "rgba(246,198,103,0.95)",2.2);
+      PB.vline(cx,"rgba(167,139,250,0.55)");
+      PB.dot(cx,Ax,"#A78BFA",5.5);
+      PB.label("A(x) — accumulated area.  its slope = top height", 0.1, Amax*1.0, "#A78BFA","left");
+
+      elX.textContent=fmt(cx); elF.textContent=fmt(f(cx)); elA.textContent=fmt(Ax); elS.textContent=fmt(m);
+    }
+    function pointer(e){
+      const r=top.getBoundingClientRect();
+      const px=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+      cx=Math.max(B.xmin+0.08, Math.min(B.xmax-0.05, PT.ix(px)));
+      draw();
+    }
+    let down=false;
+    function bind(cv){
+      cv.addEventListener("pointerdown",e=>{down=true;cv.setPointerCapture(e.pointerId);pointer(e);});
+      cv.addEventListener("pointermove",e=>{if(down)pointer(e);});
+      cv.addEventListener("pointerup",()=>down=false);
+      cv.addEventListener("pointercancel",()=>down=false);
+    }
+    bind(top);bind(bot);
+    register(draw);
+  })();
+
+})();
+</script>
+</body>
+</html>
