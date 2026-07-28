@@ -4,7 +4,8 @@
 ## Current Status
 Live and shared. A single-page interactive calculus site is built, pushed to GitHub, and published via GitHub Pages. The public live URL serves HTTP 200.
 
-- **Live site:** https://chrysogonum.github.io/seeing-calculus/
+- **Live site:** https://calculus.ppr3.com — moved 2026-07-28 from
+  `https://chrysogonum.github.io/seeing-calculus/`, which now redirects here
 - **Repo:** https://github.com/chrysogonum/seeing-calculus (public)
 - **Local:** `/Users/peterrepetti/calculus/index.html` (self-contained, no build step, no dependencies beyond Google Fonts)
 
