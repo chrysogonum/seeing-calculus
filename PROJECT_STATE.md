@@ -34,3 +34,18 @@ Design: dark indigo "notebook at night" theme, luminous cyan curves, amber tange
 ## Decisions this session
 - Published as a **public** GitHub Pages repo (free Pages requires public; user wants to share the link). Repo named **seeing-calculus**.
 - Dedication to Prof. Diskin and the closing personal note are visible to anyone — kept intentionally, since the piece is meant to be shared.
+
+## Deployment — recorded 2026-07-28
+
+- **Live site: https://calculus.ppr3.com** — GitHub Pages, published from branch `main` at the repo root.
+- **`git push` IS the deploy.** There is no build step and no wrangler command. Pages rebuilds on
+  push and the new bytes are live in about a minute.
+- ⚠ GUARD: **do not delete the `CNAME` file at the repo root.** It contains `calculus.ppr3.com` and is what
+  binds the subdomain. GitHub wrote it on 2026-07-28 when the custom domain was set — it was not
+  there before, so it can easily read as stray. **Deleting it unbinds the domain** and the site
+  falls back to `chrysogonum.github.io/seeing-calculus/`.
+- The old `chrysogonum.github.io/seeing-calculus/` address **301-redirects** here, so links held from before
+  the move still work. Verify at `calculus.ppr3.com`, not at the github.io address.
+- ⚠ Because GitHub committed that `CNAME` file itself, the remote moved ahead of local `main`
+  without anyone committing. If a push is rejected with `! [rejected] (fetch first)`, rebase onto
+  `origin/main` — nothing is wrong.
